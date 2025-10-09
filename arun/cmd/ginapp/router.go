@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -28,8 +29,15 @@ func boot() {
 		group.GET("/500", helloController.Error500)
 	}
 
-	fmt.Printf("metrics:http://localhost:8080/metrics\n")
-	if err := engine.Run(":8080"); err != nil {
+	host := flag.String("host", "localhost", "The hostname of the server")
+	port := flag.Int("port", 8080, "The port number of the server")
+
+	flag.Parse()
+
+	hostAndPort := fmt.Sprintf("%s:%d", *host, *port)
+
+	fmt.Printf("metrics:http://%v/metrics\n", hostAndPort)
+	if err := engine.Run(hostAndPort); err != nil {
 		panic(err)
 	}
 }

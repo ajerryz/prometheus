@@ -7,6 +7,10 @@
 - `docs`: 文档目录
 - `grafana`: grafana目录
 
+
+# prometheus
+- prometheus: [官方文档](https://prometheus.io/docs/prometheus/latest/getting_started/)
+
 # grafana
 - grafana oss: https://grafana.com/grafana/download?edition=oss&pg=oss-graf&platform=linux&plcmt=hero-btn-1
 

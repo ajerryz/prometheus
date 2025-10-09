@@ -5,3 +5,5 @@ promtool
 # grafana
 grafana-*
 grafana_*
+# etcd
+etcd-v*

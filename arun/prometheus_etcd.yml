@@ -1,0 +1,76 @@
+# my global config
+global:
+  scrape_interval: 10s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 10s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: [ "127.0.0.1:9090" ]
+        # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        labels:
+          app: "prometheus"
+  - job_name: "etcd_sd"
+    etcd_sd_configs: # 基于 etcd 的服务发现模块
+      - server: "http://localhost:2379" # etcd server 的地址和端口
+        path: '/prometheus/targets/'    # prometheus 要监控的key前缀
+        scheme: 'http'                  # 连接 etcd 使用的协议(http或https)
+        # 可选，如果 etcd 需要认证
+#        basic_auth:
+#          username: ""
+#          password: ""
+#        tls_config:
+#          ca_file: "ca.pem"
+#          cert_file: "cert.pem"
+#          key_file: "key.pem"
+    # relabeling 配置是关键，用于从 etcd 的 JSON 值中提取目标地址和标签
+    # __meta_etcd_key: 键的完整路径，例如 /prometheus/targets/my_api/192.168.1.11:8080
+    # __meta_etcd_value: 键对应的原始值（JSON 字符串）
+    # __meta_etcd_modify_index: 键的修改索引
+    # 例如:
+    # etcdctl put /prometheus/targets/my_api_staging/192.168.2.20:8080 '{"host":"192.168.2.20","port":8080,"labels":{"job":"my_api","env":"staging","app":"api"}}'
+    relabel_configs:
+      # 1.从 etcd 的key中提取 host:port
+      - source_labels: [ __meta_etcd_value ]
+        action: replace
+        regex: '.*"host":"([^"]+)".*"port":([0-9]+).*'
+        replacement: '${1}:${2}'
+        target_label: __address__
+      # 2.从 etcd 的key中提取 job标签
+      - source_labels: [ __meta_etcd_value ]
+        action: replace
+        regex: '.*"job":"([^"]+)".*'
+        replacement: '${1}'
+        target_label: job
+      # 3. 从 etcd key 中提取 env 标签
+      - source_labels: [ __meta_etcd_value ]
+        action: replace
+        regex: '.*"env":"([^"]+)".*'
+        replacement: '${1}'
+        target_label: env
+      # 4. (可选) 从 etcd 键路径中提取服务名作为标签
+      # 例如，从 "/prometheus/targets/my_api/192.168.1.11:8080" 中提取 "my_api"
+      - source_labels: [ __meta_etcd_key ]
+        action: replace
+        regex: '.*/([^/]+)/[^/]+$'
+        replacement: '${1}'
+        target_label: service
