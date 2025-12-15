@@ -1,9 +1,0 @@
-[
-  {
-    "targets": ["localhost:8080"],
-    "labels": {
-      "job": "",
-      "env": "local-test"
-    }
-  }
-]

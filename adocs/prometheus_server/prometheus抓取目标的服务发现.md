@@ -23,8 +23,8 @@ Prometheus 本身的配置（prometheus.yml）是静态的，修改后必须重�
 3. 监控与重载：Prometheus 会定期（默认每 5 分钟）检查这些文件的修改时间（mtime）。如果文件有更新，Prometheus 会自动加载新的目标配置，无需重启。这个过程是无缝的，不会中断正在进行的监控。
 
 实验：
-1. 编写`file_sd_configs`模块，例如:[prometheus_dynamicfile.yml](../../prometheus_dynamicfile.yml)。看其中的`file_sd_job`配置。
-2. 编写targets,例如:[ginapp_targets.json](../../targets/ginapp_targets.json),在该文件中可动态编写抓取目标
+1. 编写`file_sd_configs`模块，例如:[prometheus_dynamicfile.yml](../../arun/prometheus_dynamicfile.yml)。看其中的`file_sd_job`配置。
+2. 编写targets,例如:[ginapp_targets.json](../../arun/targets/ginapp_targets.json),在该文件中可动态编写抓取目标
 3. 启动prometheus,`./prometheus --config.file=prometheus_dynamaicfile.yml`
 4. 启动`ginapp`,`go run . --port 8080`
 5. 启动`ginapp`,`go run . --port 9999`
