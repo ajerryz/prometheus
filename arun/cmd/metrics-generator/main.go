@@ -10,7 +10,9 @@ import (
 )
 
 func main() {
-	quickMetricsDemo()
+	//quickMetricsDemo()
+
+	bootWebApp()
 }
 
 func quickMetricsDemo() {
@@ -40,8 +42,8 @@ func quickMetricsDemo() {
 	// (可选),mock 请求,直接操作客户端埋点
 	go func() {
 		for {
-			httpRequestTotal.Add(1000)
-			time.Sleep(time.Duration(5) * time.Second)
+			httpRequestTotal.Add(200)
+			time.Sleep(time.Duration(1) * time.Second)
 		}
 	}()
 

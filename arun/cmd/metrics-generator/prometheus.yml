@@ -1,32 +1,16 @@
-# my global config
-global:
-  scrape_interval: 5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
+global: # 全局配置
+  scrape_interval: 10s        # 抓取时间间隔
+  scrape_timeout: 10s          # 抓取超时时间
+  evaluation_interval: 10s    # 规则评估(计算)间隔
 
-
-
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          # - alertmanager:9093
-
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-# - "first_rules.yml"
-# - "second_rules.yml"
-
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
+# 抓取配置:
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: "prometheus"
+  - job_name: "prometheus_server"
+    metrics_path: '/metrics'
+    scheme: 'http'
     static_configs:
       - targets: ["127.0.0.1:9090"]
-        # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        # label 配置，作用域当前静态配置下的所有被抓取的指标
         labels:
           app: "prometheus"
   - job_name: "metrics-generator"
@@ -34,3 +18,11 @@ scrape_configs:
       - targets: ["localhost:8788"]
         labels:
           app: "metrics-generator"
+
+  - job_name: "sandbox_lb"
+    scheme: 'http'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ["10.221.49.156:8790"]
+        labels:
+          app: sandbox_lb
